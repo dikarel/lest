@@ -2,38 +2,31 @@
 
 Asynchronous, recursive `ls`
 
-## Quickstart
+## Quickstart (CoffeeScript)
 
-    const lest = require('lest')
+    lest = require './lib/lest'
 
-    lest(__dirname, (err, basenames, partialErrors) => {
-      if (err) throw err
-
-      console.log(basenames)
-
-      if (!partialErrors.length) return
-      console.error('Errors were encountered whilst inspecting ' + __dirname)
-      partialErrors.forEach(console.log)
-    })
+    lest '/Users'
+      .each ({entry, level, error}) ->
+        spacer = if level <= 0 then '' else [1..level].map(() -> '  ').join ''
+        console.log "#{spacer}#{entry || 'error: ' + error}"
 
 ## Docs
 
-### lest(path, done)
+### lest(path)
 
-Inspect and list basenames under `path` (recursive)
+Inspect and list file/dir names under `path` (recursive)
 
-#### Arguments
+**Arguments**
 
 - `path`: Path to inspect
-- `done(err, basenames, partialErrors)`
-  - `err`: Error (if any)
-  - `basenames`: An array of basenames under `path`. Ordering and uniqueness not guaranteed
-  - `partialErrors`: An array of `LestPartialError`s encountered during inspection
 
-### LestPartialError (extends Error)
+**Returns**
 
-A partial error encountered during `lest` inspection
+A [highlandjs](http://highlandjs.org) stream of objects of the following format:
 
-#### Additional properties
-
-- `path`: The path being inspected when the error occured
+    {
+      name: ".git", // File/dir name
+      error: null,  // Error message (if any)
+      level: 0      // Directory depth relative to `path`
+    }
